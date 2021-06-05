@@ -9,6 +9,11 @@
 	"categories": [
 		"Other"
 	],
+	"publisher": "ConradLudgate",
+	"repository": {
+		"type": "github",
+		"url": "https://github.com/conradludgate/vscode-rust-playground"
+	},
 	"activationEvents": [
 		"onCommand:rust-playground.newPlayground",
 		"onWebviewPanel:rustPlayground"
