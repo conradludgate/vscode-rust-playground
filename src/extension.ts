@@ -1,18 +1,15 @@
-import { execFile, spawn } from 'child_process';
-import { mkdir, mkdtemp } from 'fs/promises';
+import { execFile } from 'child_process';
+import { mkdir } from 'fs/promises';
 import { tmpdir } from 'os';
 import { join } from 'path';
+import { generateSlug } from 'random-word-slugs';
 import * as vscode from 'vscode';
+import { PlaygroundPanel } from './playgroundPanel';
 
 export function activate(context: vscode.ExtensionContext) {
-	// context.subscriptions.push(PlaygroundEditorProvider.register(context));
-
-	let panel: vscode.WebviewPanel | undefined;
-	let tmp: string;
 	context.subscriptions.push(vscode.commands.registerCommand('rust-playground.newPlayground', async () => {
-		tmp = join(tmpdir(), "rust-playground", await mkdtemp("playground-"));
+		const tmp = tmpDir();
 		await mkdir(tmp, { recursive: true });
-		console.log({tmp});
 
 		execFile("cargo", ["init", "--bin", "--quiet", "--offline", "--vcs", "none"], {
 			cwd: tmp,
@@ -21,10 +18,7 @@ export function activate(context: vscode.ExtensionContext) {
 				const uri = vscode.Uri.file(join(tmp, "src", "main.rs"));
 				const doc = await vscode.workspace.openTextDocument(uri);
 				await vscode.window.showTextDocument(doc, vscode.ViewColumn.One);
-				panel = vscode.window.createWebviewPanel("rustPlayground", "Playground", {
-					viewColumn: vscode.ViewColumn.Two,
-					preserveFocus: true
-				});
+				new PlaygroundPanel(tmp);
 			} else {
 				vscode.window.showErrorMessage("Could not create playground", stderr);
 			}
@@ -32,29 +26,19 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 
 	context.subscriptions.push(vscode.workspace.onDidSaveTextDocument(async (event) => {
-		if (event.uri.fsPath.startsWith(tmp) && panel) {
-			panel.webview.html = "running...";
-			const output = execFile("cargo", ["run"], {
-				cwd: tmp,
-			}, (error, stdout, stderr) => {
-				if (panel) {
-					if (error) {
-						panel.webview.html = `<h1>error</h1><p>${stderr}</p>`;
-					} else {
-						panel.webview.html = `<h1>success</h1><p>${stdout}</p>`;
-					}
-				}
-			});
+		if (event.uri.fsPath.startsWith(playgroundDir())) {
+			const playground = event.uri.fsPath.replace("/src/main.rs", "");
+			PlaygroundPanel.shouldUpdate(playground);
 		}
 	}));
-
-	// const myProvider = new (class implements vscode.TextDocumentContentProvider {
-	// 	// emitter and its event
-	// 	onDidChangeEmitter = new vscode.EventEmitter<vscode.Uri>();
-	// 	onDidChange = this.onDidChangeEmitter.event;
-
-	// 	//...
-	// })();
 }
 
 export function deactivate() { }
+
+function playgroundDir(): string {
+	return join(tmpdir(), "vscode-rust-playground");
+}
+
+function tmpDir(): string {
+	return join(playgroundDir(), generateSlug(3, { format: "kebab" }));
+}
