@@ -1,6 +1,6 @@
-import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
+import * as child from 'child_process';
+import { SIGINT } from 'constants';
 import * as vscode from 'vscode';
-import AbortController from "abort-controller";
 
 export class PlaygroundPanel {
     public static readonly viewType = 'rustPlayground';
@@ -13,7 +13,21 @@ export class PlaygroundPanel {
     private _stdout: string[] = [];
     private _stderr: string[] = [];
 
-    constructor(playground: string) {
+    public static open(playground: string) {
+        if (PlaygroundPanel.openPanels[playground]) {
+            PlaygroundPanel.openPanels[playground].reveal();
+        } else {
+            new PlaygroundPanel(playground);
+        }
+    }
+
+    public static close(playground: string) {
+        if (PlaygroundPanel.openPanels[playground]) {
+            PlaygroundPanel.openPanels[playground].dispose();
+        }
+    }
+
+    private constructor(playground: string) {
         this._playground = playground;
 
         this._panel = vscode.window.createWebviewPanel(PlaygroundPanel.viewType, "Playground Output", {
@@ -22,6 +36,10 @@ export class PlaygroundPanel {
         });
 
         PlaygroundPanel.openPanels[playground] = this;
+    }
+
+    private reveal() {
+        this._panel.reveal(vscode.ViewColumn.Two, true);
     }
 
     public dispose() {
@@ -38,28 +56,26 @@ export class PlaygroundPanel {
         }
     }
 
-    private _stream: ChildProcessWithoutNullStreams | undefined;
+    private _stream: child.ChildProcess | undefined;
 
     public static async shouldUpdate(playground: string) {
         return await this.openPanels[playground]?.shouldUpdate();
     }
 
     async shouldUpdate() {
+        this._stream?.kill(SIGINT);
+
         this._stderr = [];
         this._stdout = [];
 
-        this._stream = spawn("cargo", ["run"], { cwd: this._playground });
-        this._stream.stdout.on("data", data => {
+        this._stream = child.spawn("cargo", ["run"], { cwd: this._playground });
+        this._stream.stdout!.on("data", data => {
             this._stdout.push(data);
             this.update();
         });
-        this._stream.stderr.on("data", data => {
+        this._stream.stderr!.on("data", data => {
             this._stderr.push(data);
             this.update();
-        });
-        this._stream.on("close", code => {
-            this._stream?.disconnect();
-            this._stream = undefined;
         });
     }
 

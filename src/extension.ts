@@ -18,11 +18,24 @@ export function activate(context: vscode.ExtensionContext) {
 				const uri = vscode.Uri.file(join(tmp, "src", "main.rs"));
 				const doc = await vscode.workspace.openTextDocument(uri);
 				await vscode.window.showTextDocument(doc, vscode.ViewColumn.One);
-				new PlaygroundPanel(tmp);
 			} else {
 				vscode.window.showErrorMessage("Could not create playground", stderr);
 			}
 		});
+	}));
+
+	context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(async (event) => {
+		if (event?.document.uri.fsPath.startsWith(playgroundDir())) {
+			const playground = event?.document.uri.fsPath.replace("/src/main.rs", "");
+			PlaygroundPanel.open(playground);
+		}
+	}));
+
+	context.subscriptions.push(vscode.workspace.onDidCloseTextDocument(async (event) => {
+		if (event.uri.fsPath.startsWith(playgroundDir())) {
+			const playground = event.uri.fsPath.replace("/src/main.rs", "");
+			PlaygroundPanel.close(playground);
+		}
 	}));
 
 	context.subscriptions.push(vscode.workspace.onDidSaveTextDocument(async (event) => {
