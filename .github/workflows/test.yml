@@ -11,8 +11,16 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: 14
+      - name: install
+        run: yarn install
+      - name: test
+        run: yarn pretest && xvfb-run -a yarn test
+        if: runner.os == 'Linux'
       - name: test
         run: yarn pretest && yarn test
+        if: runner.os != 'Linux'
+
+
   lint:
     runs-on: ubuntu-latest
     steps:
@@ -20,5 +28,7 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: 14
+      - name: install
+        run: yarn install
       - name: lint
         run: yarn lint

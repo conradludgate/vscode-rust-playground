@@ -6,9 +6,11 @@ import * as vscode from 'vscode';
 // import * as myExtension from '../../extension';
 
 suite('Extension Test Suite', () => {
-	vscode.window.showInformationMessage('Start all tests.');
+	after(async () => {
+		await vscode.commands.executeCommand("rust-playground.newPlayground");
+	});
 
-	test('Sample test', () => {
+	test('Sample test', async () => {
 		assert.strictEqual(-1, [1, 2, 3].indexOf(5));
 		assert.strictEqual(-1, [1, 2, 3].indexOf(0));
 	});
