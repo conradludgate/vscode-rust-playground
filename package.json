@@ -2,7 +2,7 @@
 	"name": "rust-playground",
 	"displayName": "Rust Playground",
 	"description": "Convenient and fast way to play around with Rust",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"engines": {
 		"vscode": "^1.56.0"
 	},
