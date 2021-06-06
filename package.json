@@ -2,10 +2,11 @@
 	"name": "rust-playground",
 	"displayName": "Rust Playground",
 	"description": "Convenient and fast way to play around with Rust",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"engines": {
 		"vscode": "^1.56.0"
 	},
+	"icon": "images/ferrisHammer.png",
 	"categories": [
 		"Other"
 	],

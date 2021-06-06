@@ -1,5 +1,8 @@
 # rust-playground
 
+![Ferris holding a hammer](images/ferrisHammer.png "Logo provided by Aurorans Solis")
+> Logo provided by Aurorans Solis
+
 The Rust Playground website is great for playing around with a small
 idea in Rust, but it's unfortunate that it has to run in the browser
 on someone elses machine, subject to rate limiting, slow compile times, 8 second timeouts...
