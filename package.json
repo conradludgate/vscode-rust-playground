@@ -1,5 +1,5 @@
 {
-	"name": "rust-playground",
+	"name": "vscode-rust-playground",
 	"displayName": "Rust Playground",
 	"description": "Convenient and fast way to play around with Rust",
 	"version": "0.1.2",
