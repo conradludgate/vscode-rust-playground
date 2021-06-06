@@ -17,10 +17,10 @@ jobs:
       - name: install
         run: yarn install
       - name: test
-        run: yarn pretest && xvfb-run -a yarn test
+        run: yarn run compile && xvfb-run -a yarn test
         if: runner.os == 'Linux'
       - name: test
-        run: yarn pretest && yarn test
+        run: yarn run compile && yarn test
         if: runner.os != 'Linux'
 
 
@@ -34,4 +34,4 @@ jobs:
       - name: install
         run: yarn install
       - name: lint
-        run: yarn lint
+        run: yarn run compile && yarn run lint
