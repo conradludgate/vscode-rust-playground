@@ -17,16 +17,46 @@
 	},
 	"activationEvents": [
 		"onCommand:rust-playground.newPlayground",
-		"onWebviewPanel:rustPlayground"
+		"onView:rust-playground.playgroundView"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
+		"viewsContainers": {
+			"panel": [
+				{
+					"id": "rust-playground",
+					"title": "Rust Playground",
+					"icon": "media/ferris.svg"
+				}
+			]
+		},
+		"views": {
+			"rust-playground": [
+				{
+					"type": "webview",
+					"id": "rust-playground.playgroundView",
+					"name": "Output"
+				}
+			]
+		},
 		"commands": [
 			{
 				"command": "rust-playground.newPlayground",
 				"title": "Create a New Rust Playground"
+			},
+			{
+				"command": "rust-playground.stopProcess",
+				"title": "Stop Process"
 			}
-		]
+		],
+		"menus": {
+			"editor/title": [
+				{
+					"command": "rust-playground.stopProcess",
+					"group": "navigation"
+				}
+			]
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "yarn run compile",
