@@ -41,17 +41,9 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.workspace.onDidSaveTextDocument(async (event) => {
 		const path = isPlyrs(event.uri.fsPath);
 		if (path) {
-			console.log({path});
 			PlaygroundTerminal.onSave(path);
 		}
 	}));
-
-	// context.subscriptions.push(vscode.commands.registerCommand('rust-playground.stopProcess', async () => {
-
-	// }));
-
-	// const provider = new PlaygroundOutputProvider(context.extensionUri);
-	// context.subscriptions.push(vscode.window.registerWebviewViewProvider(PlaygroundOutputProvider.viewType, provider));
 }
 
 export function deactivate() { }
@@ -72,7 +64,6 @@ async function execFile(file: string, args: readonly string[] | null | undefined
 }
 
 function isPlyrs(fsPath?: string): string | null {
-	console.log({fsPath});
 	if (!fsPath) {
 		return null;
 	}
