@@ -2,7 +2,7 @@
 	"name": "vscode-rust-playground",
 	"displayName": "Rust Playground",
 	"description": "Convenient and fast way to play around with Rust",
-	"version": "0.1.2",
+	"version": "0.2.0",
 	"engines": {
 		"vscode": "^1.56.0"
 	},
@@ -16,47 +16,16 @@
 		"url": "https://github.com/conradludgate/vscode-rust-playground"
 	},
 	"activationEvents": [
-		"onCommand:rust-playground.newPlayground",
-		"onView:rust-playground.playgroundView"
+		"onCommand:rust-playground.newPlayground"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
-		"viewsContainers": {
-			"panel": [
-				{
-					"id": "rust-playground",
-					"title": "Rust Playground",
-					"icon": "media/ferris.svg"
-				}
-			]
-		},
-		"views": {
-			"rust-playground": [
-				{
-					"type": "webview",
-					"id": "rust-playground.playgroundView",
-					"name": "Output"
-				}
-			]
-		},
 		"commands": [
 			{
 				"command": "rust-playground.newPlayground",
 				"title": "Create a New Rust Playground"
-			},
-			{
-				"command": "rust-playground.stopProcess",
-				"title": "Stop Process"
 			}
-		],
-		"menus": {
-			"editor/title": [
-				{
-					"command": "rust-playground.stopProcess",
-					"group": "navigation"
-				}
-			]
-		}
+		]
 	},
 	"scripts": {
 		"vscode:prepublish": "yarn run compile",

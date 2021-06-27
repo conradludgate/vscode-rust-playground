@@ -1,11 +1,11 @@
 import { ExecFileOptions } from 'child_process';
 import { execFile as execFileSync } from 'child_process';
 import { mkdir } from 'fs/promises';
-import { tmpdir } from 'os';
 import { join } from 'path';
 import { generateSlug } from 'random-word-slugs';
 import * as vscode from 'vscode';
-import { PlaygroundOutputProvider } from './playgroundPanel';
+import { isPlyrs, playgroundDir } from './dir';
+import { PlaygroundLinkProvider } from './playgroundLinkProvider';
 import { PlaygroundTerminal } from './playgroundTerminal';
 
 export function activate(context: vscode.ExtensionContext) {
@@ -19,7 +19,7 @@ export function activate(context: vscode.ExtensionContext) {
 			});
 			const uri = vscode.Uri.file(join(tmp, "src", "main.rs"));
 			const doc = await vscode.workspace.openTextDocument(uri);
-			await vscode.window.showTextDocument(doc, vscode.ViewColumn.One);
+			await vscode.window.showTextDocument(doc);
 		} catch (err) {
 			vscode.window.showErrorMessage("Could not create playground", err);
 		}
@@ -29,12 +29,13 @@ export function activate(context: vscode.ExtensionContext) {
 		const path = isPlyrs(event?.document.uri.fsPath);
 		if (path) {
 			PlaygroundTerminal.show(path);
-		}
-	}));
 
-	context.subscriptions.push(vscode.workspace.onDidCloseTextDocument(async (event) => {
-		const path = isPlyrs(event.uri.fsPath);
-		if (path) {
+			const ra = vscode.extensions.getExtension("matklad.rust-analyzer");
+			if (ra !== undefined) {
+				if (!ra.isActive) {
+					await ra.activate();
+				}
+			}
 		}
 	}));
 
@@ -44,13 +45,12 @@ export function activate(context: vscode.ExtensionContext) {
 			PlaygroundTerminal.onSave(path);
 		}
 	}));
+
+	context.subscriptions.push(vscode.window.registerTerminalLinkProvider(new PlaygroundLinkProvider));
 }
 
 export function deactivate() { }
 
-function playgroundDir(): string {
-	return join(tmpdir(), "vscode-rust-playground");
-}
 
 async function execFile(file: string, args: readonly string[] | null | undefined, options: ExecFileOptions): Promise<{ stdout: String, stderr: String }> {
 	return new Promise((resolve, reject) => {
@@ -61,14 +61,4 @@ async function execFile(file: string, args: readonly string[] | null | undefined
 			resolve({ stdout, stderr });
 		});
 	});
-}
-
-function isPlyrs(fsPath?: string): string | null {
-	if (!fsPath) {
-		return null;
-	}
-	if (fsPath.startsWith(playgroundDir()) && fsPath.endsWith("/src/main.rs")) {
-		return fsPath.replace(/\/src\/main.rs$/, "");
-	}
-	return null;
 }
