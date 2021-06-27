@@ -2,7 +2,7 @@
 	"name": "vscode-rust-playground",
 	"displayName": "Rust Playground",
 	"description": "Convenient and fast way to play around with Rust",
-	"version": "0.1.2",
+	"version": "0.2.0",
 	"engines": {
 		"vscode": "^1.56.0"
 	},
@@ -16,8 +16,7 @@
 		"url": "https://github.com/conradludgate/vscode-rust-playground"
 	},
 	"activationEvents": [
-		"onCommand:rust-playground.newPlayground",
-		"onWebviewPanel:rustPlayground"
+		"onCommand:rust-playground.newPlayground"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
