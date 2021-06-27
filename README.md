@@ -11,7 +11,7 @@ How about instead of using it in the browser, you could use it in your regular e
 
 ## Example
 
-One command will open up a new playground. On the left would be your playground code, on the right is the playground output. When you save the code, you will see the output from the playground on the right hand side automatically update
+Use the command to create a new rust playground. Adjust the newly created terminals to your liking. Save the open file and watch it output in the terminal
 
 ![Video demonstrating the extension](images/example.gif)
 

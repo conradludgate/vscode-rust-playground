@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as child from 'child_process';
-import { SIGTERM } from 'constants';
+import { SIGINT } from 'constants';
 
 export class PlaygroundTerminal {
     private static terminals: Record<string, PlaygroundTerminal> = {};
@@ -33,8 +33,7 @@ export class PlaygroundTerminal {
     private onSave() {
         const stdout = (this.stdout.creationOptions as vscode.ExtensionTerminalOptions).pty as PlaygroundStdTerminal;
         const stderr = (this.stderr.creationOptions as vscode.ExtensionTerminalOptions).pty as PlaygroundErrTerminal;
-
-        this._stream?.kill(SIGTERM);
+        this._stream?.kill();
 
         stdout.clear();
         stderr.clear();
@@ -57,7 +56,8 @@ export class PlaygroundStdTerminal implements vscode.Pseudoterminal {
     close(): void { }
 
     clear() {
-        this.onDidWriteEmitter.fire('\x1b[H\x1b[J================ STANDARD OUTPUT ================\n\n\r');
+        this.clear()
+        this.onDidWriteEmitter.fire('================ STANDARD OUTPUT ================\n\n\r');
     }
 
     write(data: Buffer) {
@@ -76,7 +76,8 @@ export class PlaygroundErrTerminal implements vscode.Pseudoterminal {
     close(): void { }
 
     clear() {
-        this.onDidWriteEmitter.fire('\x1b[H\x1b[J================ STANDARD  ERROR ================\n\n\r');
+        this.clear();
+        this.onDidWriteEmitter.fire('================ STANDARD  ERROR ================\n\n\r');
     }
 
     write(data: Buffer) {
