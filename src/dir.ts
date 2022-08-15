@@ -1,4 +1,4 @@
-import { join } from 'path';
+import { join, relative } from 'path';
 import { tmpdir } from 'os';
 
 export function playgroundDir(): string {
@@ -9,8 +9,9 @@ export function isPlyrs(fsPath?: string): string | null {
 	if (!fsPath) {
 		return null;
 	}
-	if (fsPath.startsWith(playgroundDir()) && fsPath.endsWith("/src/main.rs")) {
-		return fsPath.replace(/\/src\/main.rs$/, "");
+	let rel = relative(playgroundDir(), fsPath);
+	if (!rel.startsWith("..") && rel.endsWith(join("src", "main.rs"))) {
+		return join(fsPath, "../..");
 	}
 	return null;
 }
