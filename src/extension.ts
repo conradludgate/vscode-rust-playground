@@ -1,6 +1,6 @@
 import { ExecFileOptions } from 'child_process';
 import { execFile as execFileSync } from 'child_process';
-import { mkdir } from 'fs/promises';
+import { mkdir, readdir, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { generateSlug } from 'random-word-slugs';
 import * as vscode from 'vscode';
@@ -12,11 +12,25 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.commands.registerCommand('rust-playground.newPlayground', async () => {
 		try {
 			const slug = generateSlug(3, { format: "kebab" });
-			const tmp = join(playgroundDir(), slug);
+			const dir = playgroundDir();
+            const projects_dir = join(dir, "projects/");
+			const tmp = join(projects_dir, slug);
+			
 			await mkdir(tmp, { recursive: true });
 			await execFile("cargo", ["init", "--bin", "--quiet", "--offline", "--vcs", "none"], {
 				cwd: tmp,
 			});
+			
+			//Edit Cargo.toml of the workspace project
+            const cargoToml = join(dir, "Cargo.toml");
+            
+            const files = await readdir(projects_dir);
+            const newCargoTomlContents = "[workspace]\nmembers = [" + 
+                files.map((f) => '"projects/' + f + '"').join(",") +
+                "]\n";
+            
+            await writeFile(cargoToml, newCargoTomlContents);
+			            
 			const uri = vscode.Uri.file(join(tmp, "src", "main.rs"));
 			const doc = await vscode.workspace.openTextDocument(uri);
 			await vscode.window.showTextDocument(doc);
